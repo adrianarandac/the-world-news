@@ -1,0 +1,17 @@
+{
+  "name": "The World News",
+  "description": "Extension that scrapes Reddit and displays the titles of the latest world news.",
+  "version": "1.0.2",
+  "manifest_version": 3,
+  "icons": {
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  }
+}
