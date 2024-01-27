@@ -1,49 +1,61 @@
 const NUM_OF_ARTICLES = 12;
+const REDDIT_WORLDNEWS_URL = "https://www.reddit.com/r/worldnews.json";
 
-async function getData() {
-  let redditURL = "https://www.reddit.com/r/worldnews.json";
-  let customURL = "http://127.0.0.1:8000/news";
-
+async function fetchRedditArticles() {
   try {
-    let res = await fetch(redditURL);
-    let resJson = await res.json();
-    console.log(resJson);
-    return resJson;
+    console.log("Fetching data from Reddit...");
+    const response = await fetch(REDDIT_WORLDNEWS_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const responseJson = await response.json();
+    console.log("responseJson:", responseJson);
+    return responseJson.data.children
+      .map((child) => child.data)
+      .filter((article) => !article.title.includes("/r/WorldNews"))
+      .slice(0, NUM_OF_ARTICLES);
   } catch (error) {
-    console.log(error);
+    console.error("Failed to fetch data from Reddit:", error);
   }
 }
 
-const render = async () => {
+function updateRefreshTime() {
+  const refreshTimeElement = document.querySelector(".refresh-time");
+  const now = new Date();
+  refreshTimeElement.textContent = `Last update: ${now.toLocaleDateString("en-US", { weekday: "long" })} at ${now.toLocaleTimeString("en-US")}`;
+}
+
+function cleanList() {
+  const listElement = document.getElementById("myList");
+  listElement.innerHTML = "";
+}
+
+function renderArticles(articles) {
+  const listElement = document.getElementById("myList");
+  articles.forEach((article) => {
+    const listItemHTML = `<li><a href="https://reddit.com${article.permalink}" target="_blank">${article.title}.</a></li>`;
+    listElement.insertAdjacentHTML("beforeend", listItemHTML);
+  });
+}
+
+function renderError() {
+  console.warn("Reddit is blocking scraping. Showing error message.");
+  const listElement = document.getElementById("myList");
+  const listItemHTML = `<p class="error">
+  Apologies for the inconvenience, it seems Reddit is currently unavailable for scraping. 
+  Please, visit the 
+  <a href="https://reddit.com/r/worldnews" target="_blank"><u>WorldNews subreddit</u></a> while I work on the fix!
+  <br>- Sincerely, Adrian Aranda.</p>`;
+  listElement.insertAdjacentHTML("beforeend", listItemHTML);
+}
+
+async function render() {
   cleanList();
 
-  let response = await getData();
-  let list = document.getElementById("myList");
-  const now = new Date();
+  const articles = await fetchRedditArticles();
 
-  let index = 0;
-  while (list.childNodes.length !== NUM_OF_ARTICLES) {
-    if (response.data.children[index].data.title.includes("/r/WorldNews")) {
-      index += 1;
-    } else {
-      list.insertAdjacentHTML(
-        "beforeend",
-        `<li><a href="https://reddit.com${response.data.children[index].data.permalink}" target="_blank">${response.data.children[index].data.title}.</a></li>`
-      );
-      index += 1;
-    }
-  }
-
-  document.getElementsByClassName("refresh-time")[0].innerText = `Updated on ${now.toLocaleDateString("en-En", { weekday: "long" })} at ${now.getHours()}:${
-    now.getMinutes() < 10 ? "0" + now.getMinutes() : now.getMinutes()
-  }:${now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds()}`;
-};
-
-const cleanList = () => {
-  const parent = document.getElementById("myList");
-  while (parent.firstChild) {
-    parent.removeChild(parent.firstChild);
-  }
-};
+  articles != null ? renderArticles(articles) : renderError();
+  updateRefreshTime();
+}
 
 render();
