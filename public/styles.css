@@ -35,8 +35,8 @@ body::before {
   height: 100%;
   background-image: url("/public/images/texture.jpg");
   background-size: cover;
-  opacity: 0.2; /* Set the opacity to 0.5 */
-  z-index: -1; /* Specify a stack order in case you're using a different order for other elements */
+  opacity: 0.2;
+  z-index: -1;
 }
 
 li {
@@ -126,15 +126,15 @@ a:hover {
 }
 
 .github-logo-link {
-  display: flex; /* Make the link behave like a flex container */
-  align-items: center; /* Align the image vertically */
-  height: 100%; /* Set the height to 100% of its parent */
-  text-decoration: none; /* Remove the underline from the link */
+  display: flex;
+  align-items: center;
+  height: 100%;
+  text-decoration: none;
 }
 
 .github-logo-link img {
-  height: 80%; /* Make the image fill the height of its parent */
-  width: auto; /* Keep the image aspect ratio */
+  height: 80%;
+  width: auto;
 }
 
 .github-logo-link:hover,
